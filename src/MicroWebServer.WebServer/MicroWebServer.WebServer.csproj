@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Rebex.Common">
+      <HintPath>C:\Users\MR_HK\Desktop\netstandard2.1\Rebex.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Rebex.Syslog">
+      <HintPath>C:\Users\MR_HK\Desktop\netstandard2.1\Rebex.Syslog.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
