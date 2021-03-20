@@ -6,67 +6,57 @@ using Rebex.Net;
 
 namespace MicroWebServer.WebServer.Logging
 {
-    class SysLog:ILog
+    public class SysLog:ILog
     {
         private SyslogClient client;
         private SyslogMessage SyslogMessage;
         public SysLog(string HOST,int PORT)
         {
             client = new SyslogClient(SyslogTransportProtocol.Tcp, HOST, PORT);
-        }
-
-        public async Task Alert(string Message)
-        {
             SyslogMessage = new SyslogMessage();
             SyslogMessage.Facility = SyslogFacilityLevel.User;
+        }
+
+        public void Alert(string Message)
+        {
             SyslogMessage.Severity = SyslogSeverityLevel.Alert;
             SyslogMessage.Text = Message;
-            await client.SendAsync(SyslogMessage);
+            client.Send(SyslogMessage);
         }
 
-        public async Task Critical(string Message)
+        public void Critical(string Message)
         {
-            SyslogMessage = new SyslogMessage();
-            SyslogMessage.Facility = SyslogFacilityLevel.User;
             SyslogMessage.Severity = SyslogSeverityLevel.Critical;
             SyslogMessage.Text = Message;
-            await client.SendAsync(SyslogMessage);
+            client.Send(SyslogMessage);
         }
 
-        public async Task Debug(string Message)
+        public void Debug(string Message)
         {
-            SyslogMessage = new SyslogMessage();
-            SyslogMessage.Facility = SyslogFacilityLevel.User;
             SyslogMessage.Severity = SyslogSeverityLevel.Debug;
             SyslogMessage.Text = Message;
-            await client.SendAsync(SyslogMessage);
+            client.Send(SyslogMessage);
         }
 
-        public async Task Error(string Message)
+        public void Error(string Message)
         {
-            SyslogMessage = new SyslogMessage();
-            SyslogMessage.Facility = SyslogFacilityLevel.User;
             SyslogMessage.Severity = SyslogSeverityLevel.Error;
             SyslogMessage.Text = Message;
-            await client.SendAsync(SyslogMessage);
+            client.Send(SyslogMessage);
         }
 
-        public async Task Informational(string Message)
+        public void Informational(string Message)
         {
-            SyslogMessage = new SyslogMessage();
-            SyslogMessage.Facility = SyslogFacilityLevel.User;
             SyslogMessage.Severity = SyslogSeverityLevel.Informational;
             SyslogMessage.Text = Message;
-            await client.SendAsync(SyslogMessage);
+            client.Send(SyslogMessage);
         }
 
-        public async Task Warning(string Message)
+        public void Warning(string Message)
         {
-            SyslogMessage = new SyslogMessage();
-            SyslogMessage.Facility = SyslogFacilityLevel.User;
             SyslogMessage.Severity = SyslogSeverityLevel.Critical;
             SyslogMessage.Text = Message;
-            await client.SendAsync(SyslogMessage);
+            client.Send(SyslogMessage);
         }
     }
 }

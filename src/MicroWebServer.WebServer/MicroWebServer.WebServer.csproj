@@ -6,10 +6,12 @@
 
   <ItemGroup>
     <Reference Include="Rebex.Common">
-      <HintPath>C:\Users\MR_HK\Desktop\netstandard2.1\Rebex.Common.dll</HintPath>
+      <HintPath>..\..\..\..\Prgramer\netstandard2.1\Rebex.Common.dll</HintPath>
+      <Private>true</Private>
     </Reference>
     <Reference Include="Rebex.Syslog">
-      <HintPath>C:\Users\MR_HK\Desktop\netstandard2.1\Rebex.Syslog.dll</HintPath>
+      <HintPath>..\..\..\..\Prgramer\netstandard2.1\Rebex.Syslog.dll</HintPath>
+      <Private>true</Private>
     </Reference>
   </ItemGroup>
 

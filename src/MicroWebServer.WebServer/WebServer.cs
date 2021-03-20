@@ -4,42 +4,62 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-
+using MicroWebServer.WebServer.Logging;
+using MicroWebServer.WebServer.IO;
 namespace MicroWebServer.WebServer
 {
-    public class WebServer
+    public class Server
     {
-        public bool running = false;
-        private int timeout = 8;
         private Encoding charEncoder = Encoding.UTF8;
         private Socket serverSocket;
-        private Dictionary<string, string> extensions = new Dictionary<string, string>()
+        private IPAddress ipAddress;
+        private Response Response;
+        private int maxOfConnections { get; set; }
+        private int timeout { get; set; }
+        private ILog _log { get; set; }
+        private int port { get; set; }
+        public bool running = false;
+ 
+        public Server(IPAddress ipAddress, int port, int maxOfConnections,ConsoleLog consoleLog)
         {
-            { "htm", "text/html" },
-            { "html", "text/html" },
-            { "xml", "text/xml" },
-            { "txt", "text/plain" },
-            { "css", "text/css" },
-            { "png", "image/png" },
-            { "gif", "image/gif" },
-            { "jpg", "image/jpg" },
-            { "jpeg", "image/jpeg" },
-            { "zip", "application/zip"}
-        };
-        
-        public bool start(IPAddress ipAddress, int port, int maxNOfCon)
+            this.ipAddress = ipAddress;
+            this.port = port;
+
+            this.maxOfConnections = maxOfConnections;
+            this.timeout = 8;
+
+            Response = new Response();
+            _log = consoleLog;
+        }
+        public Server(IPAddress ipAddress, int port, int maxOfConnections, SysLog sysLog)
+        {
+            this.ipAddress = ipAddress;
+            this.port = port;
+
+            this.maxOfConnections = maxOfConnections;
+            this.timeout = 8;
+
+            Response = new Response();
+            _log = sysLog;
+        }
+        public bool start()
         {
             if (running) return false;
             try
             {
                 serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 serverSocket.Bind(new IPEndPoint(ipAddress, port));
-                serverSocket.Listen(maxNOfCon);
+                serverSocket.Listen(maxOfConnections);
                 serverSocket.ReceiveTimeout = timeout;
                 serverSocket.SendTimeout = timeout;
                 running = true;
             }
-            catch { return false; }
+            catch
+            {
+                _log.Critical("Problem setting up the server");
+                return false; 
+            }
+
             Thread requestListenerT = new Thread(() =>
             {
                 while (running)
@@ -72,8 +92,14 @@ namespace MicroWebServer.WebServer
             if (running)
             {
                 running = false;
-                try { serverSocket.Close(); }
-                catch { }
+                try 
+                {
+                    serverSocket.Close();
+                }
+                catch 
+                {
+                    _log.Error("Problem closing the socket");
+                }
                 serverSocket = null;
             }
         }
@@ -86,42 +112,18 @@ namespace MicroWebServer.WebServer
             int start = strReceived.IndexOf(httpMethod) + httpMethod.Length + 1;
             int length = strReceived.LastIndexOf("HTTP") - start - 1;
             string requestedUrl = strReceived.Substring(start, length);
-            string requestedDr;
-            string requestedData;
+            _log.Informational($"{requestedUrl} {httpMethod} {length}");
             if (httpMethod.Equals("GET") || httpMethod.Equals("POST"))
             {
-                requestedData = requestedUrl.Split('?')[1];
-                requestedDr = requestedUrl.Split('?')[0];
+                if (requestedUrl=="/")
+                {
+                    Response.send200Ok(clientSocket, "hello world !!!", Response.extensions["txt"]);
+                }
             }
             else
             {
-                //notImplemented(clientSocket);
                 return;
             }
-           
         }
-        
-        public void sendResponse(Socket clientSocket, string strContent, string responseCode, string contentType)
-        {
-            byte[] bContent = charEncoder.GetBytes(strContent);
-            sendResponse(clientSocket, bContent, responseCode, contentType);
-        }
-        private void sendResponse(Socket clientSocket, byte[] bContent, string responseCode, string contentType)
-        {
-            try
-            {
-                byte[] bHeader = charEncoder.GetBytes(
-                                    "HTTP/1.1 " + responseCode + "\r\n"
-                                  + "Server: Blockchain Web Server\r\n"
-                                  + "Content-Length: " + bContent.Length.ToString() + "\r\n"
-                                  + "Connection: close\r\n"
-                                  + "Content-Type: " + contentType + "\r\n\r\n");
-                clientSocket.Send(bHeader);
-                clientSocket.Send(bContent);
-                clientSocket.Close();
-            }
-            catch { }
-        }
-
     }
 }
