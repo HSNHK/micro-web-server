@@ -13,14 +13,13 @@ namespace MicroWebServer.WebServer
         private Encoding charEncoder = Encoding.UTF8;
         private Socket serverSocket;
         private IPAddress ipAddress;
-        private Response Response;
         private int maxOfConnections { get; set; }
         private int timeout { get; set; }
         private ILog _log { get; set; }
         private int port { get; set; }
         public bool running = false;
- 
-        public Server(IPAddress ipAddress, int port, int maxOfConnections,ConsoleLog consoleLog)
+        private Dictionary<string, Action<Requests, Response>> routeTable;
+        public Server(IPAddress ipAddress, int port, int maxOfConnections, Dictionary<string, Action<Requests,Response>> routing, ConsoleLog consoleLog)
         {
             this.ipAddress = ipAddress;
             this.port = port;
@@ -28,10 +27,10 @@ namespace MicroWebServer.WebServer
             this.maxOfConnections = maxOfConnections;
             this.timeout = 8;
 
-            Response = new Response();
+            routeTable = routing;
             _log = consoleLog;
         }
-        public Server(IPAddress ipAddress, int port, int maxOfConnections, SysLog sysLog)
+        public Server(IPAddress ipAddress, int port, int maxOfConnections, Dictionary<string, Action<Requests,Response>> routing, SysLog sysLog)
         {
             this.ipAddress = ipAddress;
             this.port = port;
@@ -39,7 +38,7 @@ namespace MicroWebServer.WebServer
             this.maxOfConnections = maxOfConnections;
             this.timeout = 8;
 
-            Response = new Response();
+            routeTable = routing;
             _log = sysLog;
         }
         public bool start()
@@ -113,16 +112,13 @@ namespace MicroWebServer.WebServer
             int length = strReceived.LastIndexOf("HTTP") - start - 1;
             string requestedUrl = strReceived.Substring(start, length);
             _log.Informational($"{requestedUrl} {httpMethod} {length}");
-            if (httpMethod.Equals("GET") || httpMethod.Equals("POST"))
+            if (routeTable.ContainsKey(requestedUrl))
             {
-                if (requestedUrl=="/")
-                {
-                    Response.send200Ok(clientSocket, "hello world !!!", Response.extensions["txt"]);
-                }
+                routeTable[requestedUrl](new Requests(strReceived),new Response(clientSocket));
             }
             else
             {
-                return;
+                new Response(clientSocket).sendNotFound("Not Found !!!", "text/html");
             }
         }
     }
