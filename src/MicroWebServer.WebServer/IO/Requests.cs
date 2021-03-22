@@ -27,7 +27,10 @@ namespace MicroWebServer.WebServer.IO
             header = new Dictionary<string, string>();
             cookie = new Dictionary<string, string>();
             string[] headerAndBody = request.Split("\r\n\r\n");
-            body = headerAndBody[1];
+            if (requestInfo["method"] != "GET" && requestInfo["method"] != "DELETE")
+            {
+                body = headerAndBody[1];
+            }
             string[] dataSplited = headerAndBody[0].Split("\n");
             for (int i = 1; i < dataSplited.Length; i++)
             {
