@@ -41,6 +41,20 @@ namespace MicroWebServer.WebServer
             routeTable = routing;
             _log = sysLog;
         }
+        private void Banner()
+        {
+            if (running)
+            {
+                Console.WriteLine("The web server was successfully launched.\nThe information is as follows : \n"
+                                  +$"*Web server runtime : {DateTime.Now} \n"
+                                  +$"*Web Server ip Address : {ipAddress} \n"
+                                  +$"*web Server Port : {port} \n"
+                                  +$"*Web server start status : {running} \n"
+                                  +$"*Max Of Connection : {maxOfConnections} \n"
+                                  +$"*Connection Time out : {timeout} Seconds\n"
+                                  +$"*Route Table row Count : {routeTable.Count}\n\r\n\r");
+            }
+        }
         public bool start()
         {
             if (running) return false;
@@ -79,11 +93,11 @@ namespace MicroWebServer.WebServer
                         });
                         requestHandler.Start();
                     }
-                    catch { }
+                    catch { _log.Error("Problem Run Request Handler"); }
                 }
             });
             requestListenerT.Start();
-
+            Banner();
             return true;
         }
         public void stop()
@@ -95,10 +109,7 @@ namespace MicroWebServer.WebServer
                 {
                     serverSocket.Close();
                 }
-                catch 
-                {
-                    _log.Error("Problem closing the socket");
-                }
+                catch {_log.Error("Problem closing the socket");}
                 serverSocket = null;
             }
         }
@@ -118,6 +129,7 @@ namespace MicroWebServer.WebServer
             }
             else
             {
+                _log.Warning($"path {requestedUrl} not found");
                 new Response(clientSocket).sendNotFound("Not Found !!!", "text/html");
             }
         }
