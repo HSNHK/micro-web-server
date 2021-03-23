@@ -1,40 +1,52 @@
-﻿using System;
-using MicroWebServer.WebServer;
-using MicroWebServer.WebServer.Logging;
+﻿using MicroWebServer.WebServer;
 using MicroWebServer.WebServer.IO;
-using System.Net;
+using MicroWebServer.WebServer.Logging;
+using System;
 using System.Collections.Generic;
+using System.Net;
 
 namespace MicroWebServer
 {
     class Program
     {
-        public static void Hello(Requests requests,Response response)
+        public static void Info(Requests requests, Response response)
         {
-            response.header["time"] =DateTime.Now.ToString();
-            response.send200Ok("Hello World!", response.extensions["htm"]);
+            Dictionary<string, string> myInfo = new Dictionary<string, string>()
+            {
+                {"name","HSNHK"},
+                {"github","https://github.com/HSNHK" },
+            };
+            response.sendJson(myInfo, 200);
+
+        }
+        public static void Index(Requests requests, Response response)
+        {
+            response.header["time"] = DateTime.Now.ToString();
+            response.send200Ok("Hello World!", response.extensions["html"]);
+
         }
         public static void Programer(Requests requests, Response response)
         {
-            if (requests.requestInfo["method"]=="POST")
+            if (requests.requestInfo["method"] == "POST")
             {
-                response.send200Ok("i'm hassan mohammadi", response.extensions["htm"]);
+                response.send200Ok("i'm hassan mohammadi", response.extensions["html"]);
             }
             else
             {
-                response.send200Ok("method not supported", response.extensions["htm"]);
+                response.send200Ok("method not supported", response.extensions["html"]);
             }
         }
         static void Main(string[] args)
         {
             ConsoleLog consoleLog = new ConsoleLog();
-            Dictionary<string, Action<Requests,Response>> urlPatterns = new Dictionary<string, Action<Requests, Response>>()
+            Dictionary<string, Action<Requests, Response>> urlPatterns = new Dictionary<string, Action<Requests, Response>>()
             {
-                {"/hello",Hello },
+                {"/",Index },
                 {"/programer", Programer},
+                {"/info", Info},
             };
 
-            Server server = new Server(IPAddress.Parse("127.0.0.1"), 8080, 10,urlPatterns, consoleLog);
+            Server server = new Server(IPAddress.Parse("127.0.0.1"), 8080, 10, urlPatterns, consoleLog);
             if (server.start())
             {
                 consoleLog.Informational("Started");
