@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -63,7 +64,7 @@ namespace MicroWebServer.WebServer.IO
         }
         private string GenerateHeader()
         {
-            if (header.Count<1)
+            if (header.Count < 1)
             {
                 return null;
             }
@@ -86,16 +87,19 @@ namespace MicroWebServer.WebServer.IO
                 clientSocket.Send(bContent);
                 clientSocket.Close();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
         /// <summary>
         /// Send information with status code 200
         /// </summary>
         /// <param name="bContent">Information to send to the client</param>
         /// <param name="contentType">Media type</param>
-        public void send200Ok(string bContent, string contentType= "json")
+        public void send200Ok(string bContent, string contentType)
         {
-            sendResponse(charEncoder.GetBytes(bContent), 200, extensions[contentType]);
+            sendResponse(charEncoder.GetBytes(bContent), 200, contentType);
         }
         /// <summary>
         /// Page creation not found
@@ -104,7 +108,7 @@ namespace MicroWebServer.WebServer.IO
         /// <param name="contentType">Media type</param>
         public void sendNotFound(string bContent, string contentType)
         {
-            sendResponse(charEncoder.GetBytes(bContent), 404, extensions[contentType]);
+            sendResponse(charEncoder.GetBytes(bContent), 404, contentType);
         }
         /// <summary>
         /// This function is used to send information with a custom status code
@@ -112,9 +116,45 @@ namespace MicroWebServer.WebServer.IO
         /// <param name="bContent">Information to send to the client</param>
         /// <param name="statusCode">Answer status code</param>
         /// <param name="contentType">Media type</param>
-        public void send(string bContent,int statusCode, string contentType= "json")
+        public void send(string bContent, int statusCode, string contentType)
         {
-            sendResponse(charEncoder.GetBytes(bContent), statusCode, extensions[contentType]);
+            sendResponse(charEncoder.GetBytes(bContent), statusCode, contentType);
+        }
+        /// <summary>
+        /// Send a json string
+        /// </summary>
+        /// <param name="bContent">json string</param>
+        /// <param name="statusCode">Answer status code</param>
+        public void sendJson(string bContent, int statusCode)
+        {
+            sendResponse(charEncoder.GetBytes(bContent), statusCode, extensions["json"]);
+        }
+        /// <summary>
+        /// Automatically converts the dictionary to json format
+        /// </summary>
+        /// <param name="bContent">dictionary</param>
+        /// <param name="statusCode">Answer status code</param>
+        public void sendJson(Dictionary<string, string> bContent, int statusCode)
+        {
+            sendResponse(charEncoder.GetBytes(JsonConvert.SerializeObject(bContent)), statusCode, extensions["json"]);
+        }
+        /// <summary>
+        /// Automatically converts the dictionaries to json format
+        /// </summary>
+        /// <param name="bContent">dictionarys</param>
+        /// <param name="statusCode">Answer status code</param>
+        public void sendJson(List<Dictionary<string, string>> bContent, int statusCode)
+        {
+            sendResponse(charEncoder.GetBytes(JsonConvert.SerializeObject(bContent)), statusCode, extensions["json"]);
+        }
+        /// <summary>
+        /// Automatically converts the object to json format
+        /// </summary>
+        /// <param name="bContent">dictionarys</param>
+        /// <param name="statusCode">Answer status code</param>
+        public void sendJson(object bContent, int statusCode)
+        {
+            sendResponse(charEncoder.GetBytes(JsonConvert.SerializeObject(bContent)), statusCode, extensions["json"]);
         }
     }
 }
