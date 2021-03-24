@@ -1,11 +1,14 @@
-﻿using System;
+﻿using MicroWebServer.WebServer.IO;
+using MicroWebServer.WebServer.Logging;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using MicroWebServer.WebServer.Logging;
-using MicroWebServer.WebServer.IO;
+using MicroWebServer.WebServer.Middleware;
+using System.Threading.Tasks;
+
 namespace MicroWebServer.WebServer
 {
     public class Server
@@ -19,24 +22,29 @@ namespace MicroWebServer.WebServer
         private int port { get; set; }
         public bool running = false;
         private Dictionary<string, Action<Requests, Response>> routeTable;
-        public Server(IPAddress ipAddress, int port, int maxOfConnections, Dictionary<string, Action<Requests,Response>> routing, ConsoleLog consoleLog)
+        private InternalMiddleware internalMiddleware;
+        public Server(IPAddress ipAddress, int port, int maxOfConnections, Dictionary<string, Action<Requests, Response>> routing, ConsoleLog consoleLog)
         {
             this.ipAddress = ipAddress;
             this.port = port;
 
             this.maxOfConnections = maxOfConnections;
             this.timeout = 8;
+
+            internalMiddleware = new InternalMiddleware();
 
             routeTable = routing;
             _log = consoleLog;
         }
-        public Server(IPAddress ipAddress, int port, int maxOfConnections, Dictionary<string, Action<Requests,Response>> routing, SysLog sysLog)
+        public Server(IPAddress ipAddress, int port, int maxOfConnections, Dictionary<string, Action<Requests, Response>> routing, SysLog sysLog)
         {
             this.ipAddress = ipAddress;
             this.port = port;
 
             this.maxOfConnections = maxOfConnections;
             this.timeout = 8;
+
+            internalMiddleware = new InternalMiddleware();
 
             routeTable = routing;
             _log = sysLog;
@@ -46,13 +54,14 @@ namespace MicroWebServer.WebServer
             if (running)
             {
                 Console.WriteLine("The web server was successfully launched.\nThe information is as follows : \n"
-                                  +$"*Web server runtime : {DateTime.Now} \n"
-                                  +$"*Web Server ip Address : {ipAddress} \n"
-                                  +$"*web Server Port : {port} \n"
-                                  +$"*Web server start status : {running} \n"
-                                  +$"*Max Of Connection : {maxOfConnections} \n"
-                                  +$"*Connection Time out : {timeout} Seconds\n"
-                                  +$"*Route Table row Count : {routeTable.Count}\n\r\n\r");
+                                  + $"*Web server runtime : {DateTime.Now} \n"
+                                  + $"*Web Server ip Address : {ipAddress} \n"
+                                  + $"*web Server Port : {port} \n"
+                                  + $"*Web server start status : {running} \n"
+                                  + $"*Max Of Connection : {maxOfConnections} \n"
+                                  + $"*Connection Time out : {timeout} Seconds\n"
+                                  + $"*Url : http://{ipAddress}:{port}\n"
+                                  + $"*Route Table row Count : {routeTable.Count}\n\r\n\r");
             }
         }
         public bool start()
@@ -70,7 +79,7 @@ namespace MicroWebServer.WebServer
             catch
             {
                 _log.Critical("Problem setting up the server");
-                return false; 
+                return false;
             }
 
             Thread requestListenerT = new Thread(() =>
@@ -105,11 +114,11 @@ namespace MicroWebServer.WebServer
             if (running)
             {
                 running = false;
-                try 
+                try
                 {
                     serverSocket.Close();
                 }
-                catch {_log.Error("Problem closing the socket");}
+                catch { _log.Error("Problem closing the socket"); }
                 serverSocket = null;
             }
         }
@@ -125,7 +134,11 @@ namespace MicroWebServer.WebServer
             _log.Informational($"{requestedUrl} {httpMethod} {length}");
             if (routeTable.ContainsKey(requestedUrl))
             {
-                routeTable[requestedUrl](new Requests(strReceived),new Response(clientSocket));
+                Response response = new Response(clientSocket);
+                Requests requests = new Requests(strReceived);   
+
+                (requests, response) =internalMiddleware.TimeHeader(requests, response);
+                routeTable[requestedUrl](requests, response);
             }
             else
             {
