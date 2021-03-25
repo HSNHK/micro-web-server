@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace MicroWebServer.WebServer.IO
 {
     public class Requests
     {
         public Dictionary<string, string> requestInfo { get; set; }
-        public Dictionary<string,string> header { get; set; }
-        public Dictionary<string,string> cookie { get; set; }
+        public Dictionary<string, string> header { get; set; }
+        public Dictionary<string, string> cookie { get; set; }
         public string body { get; set; }
         public Requests(string request)
         {
@@ -37,7 +34,7 @@ namespace MicroWebServer.WebServer.IO
                 if (dataSplited[i].Contains(":"))
                 {
                     string[] item = dataSplited[i].Split(":");
-                    if (item[0]== "cookie")
+                    if (item[0] == "cookie")
                     {
                         cookie[item[1].Split("=")[0]] = item[1].Split("=")[1];
                     }

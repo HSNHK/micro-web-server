@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Rebex.Common">
       <HintPath>..\..\..\..\Prgramer\netstandard2.1\Rebex.Common.dll</HintPath>
       <Private>true</Private>

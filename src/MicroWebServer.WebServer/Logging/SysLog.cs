@@ -9,54 +9,54 @@ namespace MicroWebServer.WebServer.Logging
     public class SysLog:ILog
     {
         private SyslogClient client;
-        private SyslogMessage SyslogMessage;
+        private SyslogMessage sysLogMessage;
         public SysLog(string HOST,int PORT)
         {
             client = new SyslogClient(SyslogTransportProtocol.Tcp, HOST, PORT);
-            SyslogMessage = new SyslogMessage();
-            SyslogMessage.Facility = SyslogFacilityLevel.User;
+            sysLogMessage = new SyslogMessage();
+            sysLogMessage.Facility = SyslogFacilityLevel.User;
         }
 
         public void Alert(string Message)
         {
-            SyslogMessage.Severity = SyslogSeverityLevel.Alert;
-            SyslogMessage.Text = Message;
-            client.Send(SyslogMessage);
+            sysLogMessage.Severity = SyslogSeverityLevel.Alert;
+            sysLogMessage.Text = Message;
+            client.Send(sysLogMessage);
         }
 
         public void Critical(string Message)
         {
-            SyslogMessage.Severity = SyslogSeverityLevel.Critical;
-            SyslogMessage.Text = Message;
-            client.Send(SyslogMessage);
+            sysLogMessage.Severity = SyslogSeverityLevel.Critical;
+            sysLogMessage.Text = Message;
+            client.Send(sysLogMessage);
         }
 
         public void Debug(string Message)
         {
-            SyslogMessage.Severity = SyslogSeverityLevel.Debug;
-            SyslogMessage.Text = Message;
-            client.Send(SyslogMessage);
+            sysLogMessage.Severity = SyslogSeverityLevel.Debug;
+            sysLogMessage.Text = Message;
+            client.Send(sysLogMessage);
         }
 
         public void Error(string Message)
         {
-            SyslogMessage.Severity = SyslogSeverityLevel.Error;
-            SyslogMessage.Text = Message;
-            client.Send(SyslogMessage);
+            sysLogMessage.Severity = SyslogSeverityLevel.Error;
+            sysLogMessage.Text = Message;
+            client.Send(sysLogMessage);
         }
 
         public void Informational(string Message)
         {
-            SyslogMessage.Severity = SyslogSeverityLevel.Informational;
-            SyslogMessage.Text = Message;
-            client.Send(SyslogMessage);
+            sysLogMessage.Severity = SyslogSeverityLevel.Informational;
+            sysLogMessage.Text = Message;
+            client.Send(sysLogMessage);
         }
 
         public void Warning(string Message)
         {
-            SyslogMessage.Severity = SyslogSeverityLevel.Critical;
-            SyslogMessage.Text = Message;
-            client.Send(SyslogMessage);
+            sysLogMessage.Severity = SyslogSeverityLevel.Critical;
+            sysLogMessage.Text = Message;
+            client.Send(sysLogMessage);
         }
     }
 }

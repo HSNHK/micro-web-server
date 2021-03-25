@@ -64,7 +64,7 @@ namespace MicroWebServer.WebServer
                                   + $"*Route Table row Count : {routeTable.Count}\n\r\n\r");
             }
         }
-        public bool start()
+        public bool Start()
         {
             if (running) return false;
             try

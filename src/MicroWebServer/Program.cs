@@ -22,7 +22,7 @@ namespace MicroWebServer
         public static void Index(Requests requests, Response response)
         {
             response.header["time"] = DateTime.Now.ToString();
-            response.send200Ok("Hello World!", response.extensions["html"]);
+            response.send200Ok("Hello World!", response.extensions["txt"]);
 
         }
         public static void Programer(Requests requests, Response response)
@@ -47,7 +47,7 @@ namespace MicroWebServer
             };
 
             Server server = new Server(IPAddress.Parse("127.0.0.1"), 8080, 10, urlPatterns, consoleLog);
-            if (server.start())
+            if (server.Start())
             {
                 consoleLog.Informational("Started");
             }
