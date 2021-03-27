@@ -22,6 +22,7 @@ namespace MicroWebServer
         public static void Index(Requests requests, Response response)
         {
             response.header["time"] = DateTime.Now.ToString();
+            response.cookie["name"] = "hasan";
             response.send200Ok("Hello World!", response.extensions["txt"]);
 
         }

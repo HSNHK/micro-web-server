@@ -58,19 +58,29 @@ namespace MicroWebServer.WebServer.IO
         /// Dictionary for header sets
         /// </summary>
         public Dictionary<string, string> header = new Dictionary<string, string>();
+        /// <summary>
+        ///  Dictionary for cookie sets
+        /// </summary>
+        public Dictionary<string, string> cookie = new Dictionary<string, string>();
         public Response(Socket clientSocket)
         {
             this.clientSocket = clientSocket;
         }
         private string GenerateHeader()
         {
-            if (header.Count < 1)
+            if (header.Count < 1 && cookie.Count< 1)
             {
                 return null;
             }
-            var items = from item in header
+            var headerItem = from item in header
                         select item.Key + ": " + item.Value;
-            return $"{string.Join("\r\n", items)}\r\n";
+
+            var cookieItem = from item in cookie
+                             select item.Key + "=" + item.Value;
+
+            string cookieStr = $"set-cookie:{string.Join(";", cookieItem)}";
+
+            return $"{cookieStr}\r\n{string.Join("\r\n", headerItem)}\r\n";
         }
         private void sendResponse(byte[] bContent, int responseCode, string contentType)
         {
