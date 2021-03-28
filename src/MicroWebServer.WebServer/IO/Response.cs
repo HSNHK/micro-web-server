@@ -78,7 +78,7 @@ namespace MicroWebServer.WebServer.IO
             var cookieItem = from item in cookie
                              select item.Key + "=" + item.Value;
 
-            string cookieStr = $"set-cookie:{string.Join(";", cookieItem)}";
+            string cookieStr = $"set-cookie:{string.Join("; ", cookieItem)}";
 
             return $"{cookieStr}\r\n{string.Join("\r\n", headerItem)}\r\n";
         }
@@ -165,6 +165,13 @@ namespace MicroWebServer.WebServer.IO
         public void sendJson(object bContent, int statusCode)
         {
             sendResponse(charEncoder.GetBytes(JsonConvert.SerializeObject(bContent)), statusCode, extensions["json"]);
+        }
+        /// <summary>
+        /// set security Header (Disable xss)
+        /// </summary>
+        public void setSecurityHeader()
+        {
+            header["X-XSS-Protection"] = "1; mode=block";
         }
     }
 }

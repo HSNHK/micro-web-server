@@ -23,8 +23,9 @@ namespace MicroWebServer
         {
             response.header["time"] = DateTime.Now.ToString();
             response.cookie["name"] = "hasan";
+            response.setSecurityHeader();
+            Console.WriteLine(requests.header["time"]);
             response.send200Ok("Hello World!", response.extensions["txt"]);
-
         }
         public static void Programer(Requests requests, Response response)
         {

@@ -82,7 +82,7 @@ namespace MicroWebServer.WebServer
                 return false;
             }
 
-            Thread requestListenerT = new Thread(() =>
+            Task.Run(() =>
             {
                 while (running)
                 {
@@ -90,7 +90,7 @@ namespace MicroWebServer.WebServer
                     try
                     {
                         clientSocket = serverSocket.Accept();
-                        Thread requestHandler = new Thread(() =>
+                        Task.Run(() =>
                         {
                             clientSocket.ReceiveTimeout = timeout;
                             clientSocket.SendTimeout = timeout;
@@ -100,12 +100,10 @@ namespace MicroWebServer.WebServer
                                 try { clientSocket.Close(); } catch { }
                             }
                         });
-                        requestHandler.Start();
                     }
                     catch { _log.Error("Problem Run Request Handler"); }
                 }
             });
-            requestListenerT.Start();
             Banner();
             return true;
         }
