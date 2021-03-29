@@ -12,5 +12,12 @@ namespace MicroWebServer.WebServer.Middleware
             response.header["time"] = DateTime.Now.ToString();
             return (requests,response);
         }
+        public (Requests,Response) RequestInfo(Requests requests,Response response)
+        {
+            Console.WriteLine($"*Path : {requests.requestInfo["path"]}\r\n" +
+                              $"*Method : {requests.requestInfo["method"]}\r\n" +
+                              $"*Http Version : {requests.requestInfo["httpVersion"]}");
+            return (requests, response);
+        }
     }
 }

@@ -122,7 +122,7 @@ namespace MicroWebServer.WebServer
         }
         private void handleTheRequest(Socket clientSocket)
         {
-            byte[] buffer = new byte[10240];
+            byte[] buffer = new byte[1024];
             int receivedBCount = clientSocket.Receive(buffer);
             string strReceived = charEncoder.GetString(buffer, 0, receivedBCount);
             string httpMethod = strReceived.Substring(0, strReceived.IndexOf(" "));
@@ -135,7 +135,8 @@ namespace MicroWebServer.WebServer
                 Response response = new Response(clientSocket);
                 Requests requests = new Requests(strReceived);   
 
-                (requests, response) =internalMiddleware.TimeHeader(requests, response);
+                (requests, response) = internalMiddleware.TimeHeader(requests, response);
+                (requests, response) = internalMiddleware.RequestInfo(requests, response);
                 routeTable[requestedUrl](requests, response);
             }
             else
