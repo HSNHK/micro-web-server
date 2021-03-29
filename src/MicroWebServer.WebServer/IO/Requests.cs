@@ -47,5 +47,13 @@ namespace MicroWebServer.WebServer.IO
             }
 
         }
+        public string getHeader(string key,string defaultValue)
+        {
+            if (header.ContainsKey(key))
+            {
+                return header[key];
+            }
+            return defaultValue;
+        }
     }
 }
