@@ -78,9 +78,9 @@ namespace MicroWebServer.WebServer.IO
             var cookieItem = from item in cookie
                              select item.Key + "=" + item.Value;
 
-            string cookieStr = $"set-cookie:{string.Join("; ", cookieItem)}";
+            string cookieStr = cookie.Count>0 ? $"set-cookie:{string.Join("; ", cookieItem)}\r\n":null;
 
-            return $"{cookieStr}\r\n{string.Join("\r\n", headerItem)}\r\n";
+            return $"{cookieStr}{string.Join("\r\n", headerItem)}\r\n";
         }
         private void sendResponse(byte[] bContent, int responseCode, string contentType)
         {
