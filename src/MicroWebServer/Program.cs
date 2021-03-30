@@ -4,6 +4,7 @@ using MicroWebServer.WebServer.Logging;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 
 namespace MicroWebServer
 {
@@ -22,9 +23,10 @@ namespace MicroWebServer
         public static void Index(Requests requests, Response response)
         {
             response.header["time"] = DateTime.Now.ToString();
-            response.cookie["name"] = "hasan";
+            response.cookie["name"] = "HSNhk";
             response.setSecurityHeader();
-            Console.WriteLine(requests.header["time"]);
+            Console.WriteLine(requests.header["Host"]);
+            Console.WriteLine(requests.cookie["name"]);
             response.send200Ok("Hello World!", response.extensions["txt"]);
         }
         public static void Programer(Requests requests, Response response)
@@ -53,7 +55,7 @@ namespace MicroWebServer
             {
                 consoleLog.Informational("Started");
             }
-            Console.ReadKey();
+            Thread.CurrentThread.Join();
         }
     }
 }

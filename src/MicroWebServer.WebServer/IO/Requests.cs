@@ -5,8 +5,8 @@ namespace MicroWebServer.WebServer.IO
     public class Requests
     {
         public Dictionary<string, string> requestInfo { get; set; }
-        public Dictionary<string, string> header { get; set; }
-        public Dictionary<string, string> cookie { get; set; }
+        public Dictionary<string, string> header = new Dictionary<string, string>();
+        public Dictionary<string, string> cookie = new Dictionary<string, string>();
         public string body { get; set; }
         public Requests(string request)
         {
@@ -21,8 +21,6 @@ namespace MicroWebServer.WebServer.IO
         }
         private void Splitter(string request)
         {
-            header = new Dictionary<string, string>();
-            cookie = new Dictionary<string, string>();
             string[] headerAndBody = request.Split("\r\n\r\n");
             if (requestInfo["method"] != "GET" && requestInfo["method"] != "DELETE")
             {
@@ -33,15 +31,26 @@ namespace MicroWebServer.WebServer.IO
             {
                 if (dataSplited[i].Contains(":"))
                 {
-                    string[] item = dataSplited[i].Split(":");
-                    if (item[0] == "cookie")
+                    if (dataSplited[i].Split(":")[0] == "Cookie")
                     {
-                        cookie[item[1].Split("=")[0]] = item[1].Split("=")[1];
+                        string[] item = dataSplited[i].Split(":");
+                        if (item[1].Contains(";"))
+                        {
+                            item = item[1].Split(";");
+                            foreach (var cookieItem in item)
+                            {
+                                cookie[cookieItem.Split("=")[0].Trim()] = cookieItem.Split("=")[1];
+                            }
+                        }
+                        else
+                        {
+                            cookie[item[1].Split("=")[0].Trim()] = item[1].Split("=")[1];
+                        }
                     }
                     else
                     {
                         string[] segment = dataSplited[i].Split(":");
-                        header[segment[0].Trim()] = segment[1].Trim();
+                        header[segment[0].Trim().Trim()] = segment[1].Trim();
                     }
                 }
             }
@@ -54,6 +63,10 @@ namespace MicroWebServer.WebServer.IO
                 return header[key];
             }
             return defaultValue;
+        }
+        public string getCookie(string key, string defaultValue)
+        {
+            return cookie.ContainsKey(key) ? cookie[key] : defaultValue;
         }
     }
 }
