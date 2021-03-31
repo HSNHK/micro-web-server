@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using MicroWebServer.WebServer.Middleware;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace MicroWebServer.WebServer
 {
@@ -16,6 +17,7 @@ namespace MicroWebServer.WebServer
         private Encoding charEncoder = Encoding.UTF8;
         private Socket serverSocket;
         private IPAddress ipAddress;
+        private Regex regex;
         private int maxOfConnections { get; set; }
         private int timeout { get; set; }
         private ILog _log { get; set; }
@@ -130,16 +132,23 @@ namespace MicroWebServer.WebServer
             int length = strReceived.LastIndexOf("HTTP") - start - 1;
             string requestedUrl = strReceived.Substring(start, length);
             _log.Informational($"{requestedUrl} {httpMethod} {length}");
-            if (routeTable.ContainsKey(requestedUrl))
+            bool isValid = false;
+            foreach (var (key,_) in routeTable)
             {
-                Response response = new Response(clientSocket);
-                Requests requests = new Requests(strReceived);   
+                regex = new Regex(key);
+                if (regex.IsMatch(requestedUrl))
+                {
+                    isValid = true;
+                    Response response = new Response(clientSocket);
+                    Requests requests = new Requests(strReceived);
 
-                (requests, response) = internalMiddleware.TimeHeader(requests, response);
-                (requests, response) = internalMiddleware.RequestInfo(requests, response);
-                routeTable[requestedUrl](requests, response);
+                    (requests, response) = internalMiddleware.TimeHeader(requests, response);
+                    (requests, response) = internalMiddleware.RequestInfo(requests, response);
+                    routeTable[key](requests, response);
+                    break;
+                }
             }
-            else
+            if(!isValid)
             {
                 _log.Warning($"path {requestedUrl} not found");
                 new Response(clientSocket).sendNotFound("Not Found !!!", "text/html");
