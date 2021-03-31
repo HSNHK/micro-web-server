@@ -58,15 +58,34 @@ namespace MicroWebServer.WebServer.IO
         }
         public string getHeader(string key,string defaultValue)
         {
-            if (header.ContainsKey(key))
-            {
-                return header[key];
-            }
-            return defaultValue;
+            return header.ContainsKey(key) ? header[key] : defaultValue;
         }
         public string getCookie(string key, string defaultValue)
         {
             return cookie.ContainsKey(key) ? cookie[key] : defaultValue;
+        }
+        public string getArg(string key,string defaultValue)
+        {
+            if (requestInfo["path"].Contains('?'))
+            {
+                string allArgs = requestInfo["path"].Split('?')[1];
+                if (allArgs.Contains('&'))
+                {
+                    string[] args = allArgs.Split('&');
+                    foreach (var item in args)
+                    {
+                        if (item.Split('=')[0]==key)
+                        {
+                            return item.Split('=')[1];
+                        }
+                    }
+                }
+                if (allArgs.Split('=')[0] == key)
+                {
+                    return allArgs.Split('=')[1];
+                }
+            }
+            return defaultValue;
         }
     }
 }
