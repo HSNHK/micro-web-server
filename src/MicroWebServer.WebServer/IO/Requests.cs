@@ -4,9 +4,24 @@ namespace MicroWebServer.WebServer.IO
 {
     public class Requests
     {
+        /// <summary>
+        /// Details of the request received
+        /// method
+        /// path
+        /// httpVersion
+        /// </summary>
         public Dictionary<string, string> requestInfo { get; set; }
+        /// <summary>
+        /// Request headers received
+        /// </summary>
         public Dictionary<string, string> header = new Dictionary<string, string>();
+        /// <summary>
+        /// Request cookies received
+        /// </summary>
         public Dictionary<string, string> cookie = new Dictionary<string, string>();
+        /// <summary>
+        /// Data received on request (POST,PUT,OPTIONS)
+        /// </summary>
         public string body { get; set; }
         public Requests(string request)
         {
@@ -56,14 +71,32 @@ namespace MicroWebServer.WebServer.IO
             }
 
         }
+        /// <summary>
+        /// Get a header
+        /// </summary>
+        /// <param name="key">Header Key</param>
+        /// <param name="defaultValue">Default Value</param>
+        /// <returns></returns>
         public string getHeader(string key,string defaultValue)
         {
             return header.ContainsKey(key) ? header[key] : defaultValue;
         }
+        /// <summary>
+        /// Get a Cookie
+        /// </summary>
+        /// <param name="key">Cookie Key</param>
+        /// <param name="defaultValue">Default Value</param>
+        /// <returns></returns>
         public string getCookie(string key, string defaultValue)
         {
             return cookie.ContainsKey(key) ? cookie[key] : defaultValue;
         }
+        /// <summary>
+        /// Get URL arguments
+        /// </summary>
+        /// <param name="key">Argument Name</param>
+        /// <param name="defaultValue">Default Value</param>
+        /// <returns></returns>
         public string getArg(string key,string defaultValue)
         {
             if (requestInfo["path"].Contains('?'))
@@ -86,6 +119,25 @@ namespace MicroWebServer.WebServer.IO
                 }
             }
             return defaultValue;
+        }
+        /// <summary>
+        /// Get a  Authorization Key
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<string,string> getAuthHeader()
+        {
+            if (header.ContainsKey("Authorization"))
+            {
+                string[] authorizKey = header["Authorization"].Split(" ");
+                switch (authorizKey[0])
+                {
+                    case "Token":
+                        return new Dictionary<string, string>() { { "Token", authorizKey[1] } };
+                    default:
+                        break;
+                }
+            }
+            return null;
         }
     }
 }
