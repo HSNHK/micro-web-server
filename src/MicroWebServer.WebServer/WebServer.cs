@@ -25,6 +25,7 @@ namespace MicroWebServer.WebServer
         public bool running = false;
         private Dictionary<string, Action<Requests, Response>> routeTable;
         private InternalMiddleware internalMiddleware;
+        public List<Func<Requests, Response, (Requests, Response)>> Middlewares;
         public Server(IPAddress ipAddress, int port, int maxOfConnections, Dictionary<string, Action<Requests, Response>> routing, ConsoleLog consoleLog)
         {
             this.ipAddress = ipAddress;
@@ -34,7 +35,11 @@ namespace MicroWebServer.WebServer
             this.timeout = 8;
 
             internalMiddleware = new InternalMiddleware();
-
+            Middlewares = new List<Func<Requests, Response, (Requests, Response)>>()
+            {
+                internalMiddleware.RequestInfo,
+                internalMiddleware.TimeHeader,
+            };
             routeTable = routing;
             _log = consoleLog;
         }
@@ -141,9 +146,10 @@ namespace MicroWebServer.WebServer
                     isValid = true;
                     Response response = new Response(clientSocket);
                     Requests requests = new Requests(strReceived);
-
-                    (requests, response) = internalMiddleware.TimeHeader(requests, response);
-                    (requests, response) = internalMiddleware.RequestInfo(requests, response);
+                    foreach (var Middleware in Middlewares)
+                    {
+                        (requests, response) = Middleware(requests, response);
+                    }
                     routeTable[key](requests, response);
                     break;
                 }
