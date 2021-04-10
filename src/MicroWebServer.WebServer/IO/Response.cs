@@ -162,7 +162,7 @@ namespace MicroWebServer.WebServer.IO
         /// </summary>
         /// <param name="bContent">dictionarys</param>
         /// <param name="statusCode">Answer status code</param>
-        public void sendJson(object bContent, int statusCode)
+        public void sendJson<T>(T bContent, int statusCode)
         {
             sendResponse(charEncoder.GetBytes(JsonConvert.SerializeObject(bContent)), statusCode, extensions["json"]);
         }
