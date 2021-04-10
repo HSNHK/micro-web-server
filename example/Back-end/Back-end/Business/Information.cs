@@ -15,9 +15,16 @@ namespace Back_end.Business
         }
         public Data.Information Create(Data.Information information)
         {
-            peoplesContext.Information.Add(information);
+            var value= peoplesContext.Information.Add(new Data.Information 
+            {
+                Firstname=information.Firstname,
+                Lastname=information.Lastname,
+                Email=information.Email,
+                Address=information.Address,
+                time=DateTime.Now
+            }).Entity;
             peoplesContext.SaveChanges();
-            return information;
+            return value;
         }
 
         public bool Delete(int Id)
@@ -32,10 +39,9 @@ namespace Back_end.Business
             return false;
         }
 
-        public Data.Information Find(string name)
+        public List<Data.Information> Find(string name)
         {
-            var information = peoplesContext.Information.Where(info => info.Firstname == name).Single();
-            return information;
+            return peoplesContext.Information.Where(info => info.Firstname == name).ToList();
         }
 
         public List<Data.Information> GetAllInformation()
@@ -57,9 +63,12 @@ namespace Back_end.Business
                 info.Lastname = information.Lastname;
                 info.Email = information.Email;
                 info.Address = information.Address;
-                info.time = information.time;
+                peoplesContext.SaveChanges();
+                information.Id = Id;
+                information.time = DateTime.Now;
+                return information;
             }
-            return information;
+            return null;
         }
     }
 }

@@ -12,6 +12,6 @@ namespace Back_end.Data
         Information Update(int Id, Information information);
         bool Delete(int Id);
         List<Information> GetAllInformation();
-        Information Find(string name);
+        List<Information> Find(string name);
     }
 }
