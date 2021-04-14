@@ -53,6 +53,12 @@ namespace Back_end
             Data.Information POST = JsonConvert.DeserializeObject<Data.Information>(requests.body);
             response.sendJson(information.Update(id, POST), 200);
         }
+        public static (Requests,Response) AccessControllMiddleware(Requests requests, Response response)
+        {
+            response.header["Access-Control-Allow-Origin"] = "*";
+            response.header["Access-Control-Allow-Headers"] = "Content-Type, Content-Length, Accept-Encoding";
+            return (requests, response);
+        }
         static void Main()
         {
             LoadConfiguration();
@@ -65,9 +71,9 @@ namespace Back_end
                 {@"^\/$", Index },
                 {@"^\/\?id\=[0-9]$", GetItem },
                 {@"^\/create", Create },
-                {@"^\/delete\?id\=[0-9]$", Delete },
-                {@"^\/find\?name\=[a-z]+$", Find },
-                {@"^\/update\?id\=[0-9]$", Upate },
+                {@"^\/delete\?id\=[0-9]+$", Delete },
+                {@"^\/find\?name\=[a-zA-Z]+$", Find },
+                {@"^\/update\?id\=[0-9]+$", Upate },
             };
             var serverConfiguration = Configuration.GetSection("Server").GetChildren().ToList();
             Server server = new Server(
@@ -77,6 +83,7 @@ namespace Back_end
                 urlPatterns,
                 consoleLog
                 );
+            server.Middlewares.Add(AccessControlMiddleware);
             if (server.Start())
             {
                 consoleLog.Informational("Started");
