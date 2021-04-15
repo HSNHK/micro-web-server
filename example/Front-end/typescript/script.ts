@@ -8,11 +8,16 @@ class Main{
     constructor(url:string){
         this.url = url
         var btnSearch: any = document.getElementById("btn-search")
+        var btnReload: any = document.getElementById("btn-reload")
         var txtSearch: any = document.getElementById("txt-search")
         btnSearch.onclick = (e: Event) => {
             this.search(txtSearch?.value)
         }
-       
+        btnReload.onclick=(e:Event)=>{
+           this.get().then((data)=>{
+               this.show(data)
+           })
+        }
     }
     get(): Promise<any> {
         return fetch(this.url)
@@ -30,9 +35,18 @@ class Main{
     show(data: Array<Iinformation>): void{
         var rowCount: number = 1
         var table: any = document.getElementById("tb_main");
-        
+        //clear old item
+        table.innerHTML=null;
+        var row = table.insertRow(0)
+        row.insertCell(0).innerHTML = "#"
+        row.insertCell(1).innerHTML = "First"
+        row.insertCell(2).innerHTML = "Last"
+        row.insertCell(3).innerHTML = "Address"
+        row.insertCell(4).innerHTML = "Email"
+        row.insertCell(5).innerHTML = "Time"
+        row.insertCell(6).innerHTML = "option"
         data.forEach((element:Iinformation) => {
-            var row = table.insertRow(rowCount)
+            row = table.insertRow(rowCount)
             row.setAttribute('id', `row${element.Id}`)
             row.insertCell(0).innerHTML = rowCount;
             row.insertCell(1).innerHTML = element.Firstname;
@@ -50,18 +64,11 @@ class Main{
             rowCount++
         });
     }
-    search(name?: string): void {
-        var table: any = document.getElementById("tb_main");
-        var tableLen: number = table.rows.length
-        console.log(tableLen)
-        if (tableLen > 1) {
-            for (var i = 1; i < tableLen - 1; i++) {
-                console.log(i)
-                table.deleteRow(i)
-            }
+    search(name: string): void {
+        if(name.length>1){
+            fetch(`${this.url}find?name=${name}`)
+               .then(response =>response.json().then(data => this.show(data)))
         }
-        fetch(`${this.url}find?name=${name}`)
-           .then(response =>response.json().then(data => this.show(data)))
     }
 }
 
