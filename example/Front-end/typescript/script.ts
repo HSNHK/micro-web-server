@@ -32,8 +32,7 @@ class Main{
             })
         })
     }
-    show(data: Array<Iinformation>): void{
-        var rowCount: number = 1
+    clearTable():void{
         var table: any = document.getElementById("tb_main");
         //clear old item
         table.innerHTML=null;
@@ -45,8 +44,14 @@ class Main{
         row.insertCell(4).innerHTML = "Email"
         row.insertCell(5).innerHTML = "Time"
         row.insertCell(6).innerHTML = "option"
+    }
+    show(data: Array<Iinformation>): void{
+        var rowCount: number = 1
+        var table: any = document.getElementById("tb_main");
+        //clear old item
+        this.clearTable()
         data.forEach((element:Iinformation) => {
-            row = table.insertRow(rowCount)
+            var row = table.insertRow(rowCount)
             row.setAttribute('id', `row${element.Id}`)
             row.insertCell(0).innerHTML = rowCount;
             row.insertCell(1).innerHTML = element.Firstname;
