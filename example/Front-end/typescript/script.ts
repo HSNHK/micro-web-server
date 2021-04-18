@@ -4,7 +4,6 @@ const ADDRES='http://127.0.0.1:8080/';
 
 class Main{
     url:string
-    
     constructor(url:string){
         this.url = url
         var btnSearch: any = document.getElementById("btn-search")
@@ -84,8 +83,6 @@ class Main{
         row.insertCell(6).innerHTML = "option"
     }
     show(data: Array<Iinformation>): void{
-        var rowCount: number = 1
-        var table: any = document.getElementById("tb_main");
         this.clearTable()
         data.forEach((element:Iinformation) => {
             this.add(element)
