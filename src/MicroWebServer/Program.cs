@@ -4,8 +4,9 @@ using MicroWebServer.WebServer.Logging;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text.RegularExpressions;
 using System.Threading;
+using Newtonsoft.Json;
+using MicroWebServer.WebServer.Utility;
 
 namespace MicroWebServer
 {
@@ -13,14 +14,22 @@ namespace MicroWebServer
     {
         public static void Info(Requests requests, Response response)
         {
-            Dictionary<string, string> myInfo = new Dictionary<string, string>()
+            if (requests.requestInfo["method"] == "POST")
             {
-                {"name",requests.getArg("name","null")},
-                {"age",requests.getArg("age","null") },
-                {"github","https://github.com/HSNHK" },
-            };
-            response.sendJson(myInfo, 200);
-
+                var x = JsonConvert.DeserializeObject<Dictionary<string,string>>(requests.body);
+                Console.WriteLine(x["name"]);
+                response.send200Ok("Hello World!", response.extensions["txt"]);
+            }
+            else
+            {
+                Dictionary<string, string> myInfo = new Dictionary<string, string>()
+                {
+                    {"name",requests.getArg("name","null")},
+                    {"age",requests.getArg("age","null") },
+                    {"github","https://github.com/HSNHK" },
+                };
+                response.sendJson(myInfo, 200);
+            }
         }
         public static void Index(Requests requests, Response response)
         {
@@ -29,7 +38,7 @@ namespace MicroWebServer
             response.setSecurityHeader();
             Console.WriteLine(requests.header["time"]);
             Console.WriteLine(requests.cookie["name"]);
-            response.send200Ok("Hello World!", response.extensions["txt"]);
+            response.send200Ok("Hello World!", response.extensions["html"]);
         }
         public static void Programer(Requests requests, Response response)
         {
@@ -42,6 +51,13 @@ namespace MicroWebServer
                 response.send200Ok("method not supported", response.extensions["html"]);
             }
         }
+        public static void Test(Requests requests,Response response)
+        {
+            string urlEncode = new HttpUtilitys().UrlDecode(requests.getArg("input", null));
+            response.send200Ok(response.safeResponse(urlEncode), response.extensions["html"]);
+            //response.send200Ok(response.safeResponse("<script>alert('hello')</script>"), response.extensions["html"]);
+
+        }
         static void Main(string[] args)
         {
             ConsoleLog consoleLog = new ConsoleLog();
@@ -50,6 +66,7 @@ namespace MicroWebServer
                 {@"^\/$",Index },
                 {@"^\/programer$", Programer},
                 {@"^\/info\?name\=[a-z]+\&age=\d+$", Info},
+                {@"^\/test\?input\=*.+$", Test}
             };
 
             Server server = new Server(IPAddress.Parse("127.0.0.1"), 8080, 10, urlPatterns, consoleLog);
