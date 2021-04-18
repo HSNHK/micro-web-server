@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
+using System.Web;
 
 namespace MicroWebServer.WebServer.IO
 {
@@ -172,6 +173,15 @@ namespace MicroWebServer.WebServer.IO
         public void setSecurityHeader()
         {
             header["X-XSS-Protection"] = "1; mode=block";
+        }
+        /// <summary>
+        /// To prevent xss attacks
+        /// </summary>
+        /// <param name="response">response</param>
+        /// <returns></returns>
+        public string safeResponse(string response)
+        {
+            return HttpUtility.HtmlEncode(response);
         }
     }
 }
