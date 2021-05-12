@@ -41,6 +41,8 @@ namespace MicroWebServer.WebServer.IO
             {204, "No Content" },
             {205, "Reset Content" },
             {305, "Use Proxy" },
+            {301, "Moved Permanently"},
+            {308, "Permanent Redirect"},
             {400, "Bad Request" },
             {401, "Unauthorized" },
             {403, "Forbidden" },
@@ -182,6 +184,15 @@ namespace MicroWebServer.WebServer.IO
         public string safeResponse(string response)
         {
             return HttpUtility.HtmlEncode(response);
+        }
+        /// <summary>
+        /// Redirect to path
+        /// </summary>
+        /// <param name="path">path or URL</param>
+        public void redirect(string path)
+        {
+            header["Location"] = path;
+            sendResponse(charEncoder.GetBytes(string.Empty), 308, string.Empty);
         }
     }
 }
