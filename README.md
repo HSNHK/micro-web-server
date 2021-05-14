@@ -111,6 +111,11 @@ response.setSecurityHeader()
 //The text generates a secure response
 response.safeResponse(response)
 ```
+Redirect:
+```csharp
+//redirect to path
+response.redirect("/path");
+```
 # Middleware
 An example of setting up a middleware:
 ```csharp
