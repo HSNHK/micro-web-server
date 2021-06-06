@@ -47,7 +47,7 @@ namespace Back_end
             string name = requests.getArg("name", null);
             response.sendJson(information.Find(name), 200);
         }
-        public static void Upate(Requests requests, Response response)
+        public static void Update(Requests requests, Response response)
         {
             int id = int.Parse(requests.getArg("id", null));
             Data.Information POST = JsonConvert.DeserializeObject<Data.Information>(requests.body);
@@ -73,7 +73,7 @@ namespace Back_end
                 {@"^\/create", Create },
                 {@"^\/delete\?id\=[0-9]+$", Delete },
                 {@"^\/find\?name\=[a-zA-Z]+$", Find },
-                {@"^\/update\?id\=[0-9]+$", Upate },
+                {@"^\/update\?id\=[0-9]+$", Update },
             };
             var serverConfiguration = Configuration.GetSection("Server").GetChildren().ToList();
             Server server = new Server(
@@ -83,7 +83,7 @@ namespace Back_end
                 urlPatterns,
                 consoleLog
                 );
-            server.Middlewares.Add(AccessControlMiddleware);
+            server.Middlewares.Add(AccessControllMiddleware);
             if (server.Start())
             {
                 consoleLog.Informational("Started");
